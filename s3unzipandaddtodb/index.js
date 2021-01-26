@@ -115,7 +115,7 @@ exports.handler =  function(event, context, callback){
                                                 metadata = "text/html";
                                             } else if (fileNameExtension === "js"){
                                                 metadata = "application/javascript";
-                                            } else if (fileNameExtension === "cs"){
+                                            } else if (fileNameExtension === "css"){
                                                 metadata = "text/css";
                                             }
 
@@ -128,7 +128,8 @@ exports.handler =  function(event, context, callback){
                                                     //     '<Content-Type>': metadata
                                                     // },
                                                     ContentType: metadata,
-                                                    MetadataDirective: "REPLACE"
+                                                    MetadataDirective: "REPLACE",
+                                                    ACL: "public-read"
                                                 }
                                                 s3.copyObject(copyParams, function(err, data){
                                                     if (err){
