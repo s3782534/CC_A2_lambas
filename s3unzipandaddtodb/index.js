@@ -50,7 +50,7 @@ exports.handler =  function(event, context, callback){
                         file: gameNameZipKey,
                         // Docs for module say targetKey, but is actually meant to say targetFolder
                         targetFolder: gameName,
-                        copyMetadata: false,
+                        copyMetadata: true,
                         deleteOnSuccess: true,
                         verbose: false
                     }, function(err, success){
@@ -108,37 +108,39 @@ exports.handler =  function(event, context, callback){
 
                                                 }
                                             })
-                                            var tempFileNameSplit = fileName.split(".");
-                                            var metadata = ""
-                                            var fileNameExtension = tempFileNameSplit[tempFileNameSplit.length - 1];
-                                            if (fileNameExtension === "html"){
-                                                metadata = "text/html";
-                                            } else if (fileNameExtension === "js"){
-                                                metadata = "application/javascript";
-                                            } else if (fileNameExtension === "css"){
-                                                metadata = "text/css";
-                                            }
+                                            // Code to change some metadata, still not enough to work
+                                            // TODO look into mime-types module to auto find the content type for files
+                                            // var tempFileNameSplit = fileName.split(".");
+                                            // var metadata = ""
+                                            // var fileNameExtension = tempFileNameSplit[tempFileNameSplit.length - 1];
+                                            // if (fileNameExtension === "html"){
+                                            //     metadata = "text/html";
+                                            // } else if (fileNameExtension === "js"){
+                                            //     metadata = "application/javascript";
+                                            // } else if (fileNameExtension === "css"){
+                                            //     metadata = "text/css";
+                                            // }
 
-                                            if (metadata !== ""){
-                                                var copyParams = {
-                                                    Bucket: html5GameBucketName,
-                                                    CopySource: (html5GameBucketName + "/" + objectKey),
-                                                    Key: objectKey,
-                                                    // Metadata: {
-                                                    //     '<Content-Type>': metadata
-                                                    // },
-                                                    ContentType: metadata,
-                                                    MetadataDirective: "REPLACE",
-                                                    ACL: "public-read"
-                                                }
-                                                s3.copyObject(copyParams, function(err, data){
-                                                    if (err){
-                                                        console.log(err, err.stack);
-                                                    } else {
+                                            // if (metadata !== ""){
+                                            //     var copyParams = {
+                                            //         Bucket: html5GameBucketName,
+                                            //         CopySource: (html5GameBucketName + "/" + objectKey),
+                                            //         Key: objectKey,
+                                            //         // Metadata: {
+                                            //         //     '<Content-Type>': metadata
+                                            //         // },
+                                            //         ContentType: metadata,
+                                            //         MetadataDirective: "REPLACE",
+                                            //         ACL: "public-read"
+                                            //     }
+                                            //     s3.copyObject(copyParams, function(err, data){
+                                            //         if (err){
+                                            //             console.log(err, err.stack);
+                                            //         } else {
 
-                                                    }
-                                                })
-                                            }
+                                            //         }
+                                            //     })
+                                            // }
                                         }
                                     })
                                     var itemParams = {
