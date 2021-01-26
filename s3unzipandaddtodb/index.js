@@ -61,40 +61,82 @@ exports.handler =  function(event, context, callback){
                             // delete all contents in old bucket
                             //TODO
                             // Add info to database
-                            var gameUrl = "https://" + html5GameBucketName + ".s3.us-east-1.amazonaws.com/"// + gameName + "/index.html";
-                            var gameUrlParams = {
+                            var gameFileListParams = {
                                 Bucket: html5GameBucketName,
-                                Prefix: "index.html",
-                                StartAfter: (gameName + "/"),
+                                // Prefix: "index",
+                                StartAfter: gameName + "/",
                             }
-                            var data2;
-                            s3.listObjectsV2(gameUrlParams, function(err, data){
+                            s3.listObjectsV2(gameFileListParams, function(err, data){
                                 if (err){
                                     console.log(err, err.stack);
                                     return;
                                 } else {
-                                    data2 = data;
+                                    console.log(data);
+                                    var gameIndexKey = "";
+                                    var gameImageKey = "";
+                                    // search through contents until index and image are found
+                                    // var listContents = data["Contents"]
+                                    data["Contents"].forEach(function(object) {
+                                    // for (var object of listContents){
+                                        // console.log(object);
+                                        var objectKey = object["Key"];
+                                        if (typeof objectKey === "string"){
+                                            // console.log("Found key")
+                                            var splitKey = objectKey.split('/');
+                                            var fileName = splitKey[splitKey.length - 1];
+                                            if (fileName === 'index.html'){
+                                                gameIndexKey = objectKey;
+                                                // if (gameImageKey !== ""){
+                                                //     // break;
+                                                // }
+                                            } else if (fileName === 'favicon.ico'){
+                                                gameImageKey = objectKey;
+                                            //     if (gameIndexKey !== ""){
+                                            //         // break;
+                                            //     }
+                                            }
+                                            var aclParams = {
+                                                Bucket: html5GameBucketName,
+                                                Key: objectKey,
+                                                ACL: "public-read",
+                                            }
+                                            s3.putObjectAcl(aclParams, function(err, data){
+                                                if (err){
+                                                    console.log(err, err.stack);
+                                                } else{
+
+                                                }
+                                            })
+                                        }
+                                    })
+                                    var itemParams = {
+                                        TableName: html5GameInfoTableName,
+                                        Item: {
+                                            "name": {S: gameName}
+                                        }
+                                    }
+                                    var bucketUrl = "https://" + html5GameBucketName + ".s3.us-east-1.amazonaws.com/"
+                                    if (gameIndexKey !== ""){
+                                        itemParams["Item"]["game_url"] = {S: bucketUrl + gameIndexKey}
+                                    }
+                                    if (gameImageKey !== ""){
+                                        itemParams["Item"]["icon_url"] = {S: bucketUrl + gameImageKey}
+                                    }
+                                    var dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+                                    dynamoDb.putItem(itemParams, function(err, data){
+                                        if (err){
+                                            console.log(err, err.stack);
+                                            console.log(itemParams);
+                                            return;
+                                        } else {
+                                            console.log(data)
+                                            return "All success";
+                                            //TODO something idk
+                                        }
+                                    })
                                 }
                             })
-                            console.log(data2);
-                            var itemParams = {
-                                TableName: html5GameInfoTableName,
-                                Item: {
-                                    "name": {S: gameName},
-                                    "game_url": {S: gameUrl}
-                                }
-                            };
-                            var dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-                            dynamoDb.putItem(itemParams, function(err, data){
-                                if (err){
-                                    console.log(err, err.stack);
-                                    return;
-                                } else {
-                                    console.log(data)
-                                    return "All success"
-                                    //TODO something idk
-                                }
-                            })
+                            
                         }
                     });
                 }
@@ -103,5 +145,5 @@ exports.handler =  function(event, context, callback){
             
         }
     });
-    // return "cool";
+    return "cool";
 }
