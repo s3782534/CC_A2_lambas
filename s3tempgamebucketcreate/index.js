@@ -11,6 +11,7 @@ exports.handler =  function(event, context, callback) {
 
     var requestBody = JSON.parse(event.body);
 
+    // TODO add name check (as it is used as primary key)
     var gameName;
     if (requestBody["name"]){
         gameName = requestBody["name"];

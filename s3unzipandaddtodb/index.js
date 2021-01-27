@@ -165,6 +165,7 @@ exports.handler =  function(event, context, callback){
                                         } else {
                                             console.log(data)
                                             return "All success";
+                                            //TODO change status of upload to "completed"
                                             //TODO something idk
                                         }
                                     })
