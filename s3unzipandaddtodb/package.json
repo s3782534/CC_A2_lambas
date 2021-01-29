@@ -2,6 +2,7 @@
   "dependencies": {
     "aws-sdk": "^2.831.0",
     "https": "^1.0.0",
+    "mime-types": "^2.1.28",
     "s3-unzip": "^0.1.13",
     "s3-unzip-plus": "^0.1.8",
     "uuid": "^8.3.2"

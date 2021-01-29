@@ -1,6 +1,7 @@
 // Load the SDK
 var AWS = require('aws-sdk');
 var s3Unzipplus = require('s3-unzip-plus');
+var mime = require('mime-types')
 
 // Name of html5 game bucket
 const html5GameBucketName = "s3782534-cca2-html5-games";
@@ -114,6 +115,29 @@ exports.handler =  function(event, context, callback){
 
                                                 }
                                             })
+                                            var contentType = mime.contentType(fileName);
+                                            console.log(contentType)
+                                            if (contentType != false){
+                                                console.log("content type change activate!")
+                                                var copyParams = {
+                                                    Bucket: html5GameBucketName,
+                                                    CopySource: (html5GameBucketName + "/" + objectKey),
+                                                    Key: objectKey,
+                                                    // Metadata: {
+                                                    //     '<Content-Type>': contentType
+                                                    // },
+                                                    ContentType: contentType,
+                                                    MetadataDirective: "REPLACE",
+                                                    ACL: "public-read"
+                                                }
+                                                s3.copyObject(copyParams, function(err, data){
+                                                    if (err){
+                                                        console.log(err);
+                                                    } else {
+
+                                                    }
+                                                })
+                                            }
                                             // Code to change some metadata, still not enough to work
                                             // TODO look into mime-types module to auto find the content type for files
                                             // var tempFileNameSplit = fileName.split(".");
