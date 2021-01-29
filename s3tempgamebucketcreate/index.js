@@ -98,11 +98,7 @@ exports.handler =  function(event, context, callback) {
                             callback(Error(err));
                         } else {
                             // Return url and bucketname
-                            callback(null, {
-                                // signedUrl: signedUrl,
-                                data: postData, 
-                                bucketName:bucketName
-                            }) 
+                            callback(null, postData) 
                         }
                     })   
 

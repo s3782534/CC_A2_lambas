@@ -1,14 +1,15 @@
 <html>
     <script src="script.js"></script> 
     <body>
-        <form name="gameUpload" method="POST" onsubmit="formSubmit()">
+        <form name="gameUpload">
             <label for="gameName">Game name: </label>
             <input type="text" id="gameName" name="gameName">
 
             <label for="gameZip">Game name: </label>
             <input type="file" id="gameZip" name="gameZip" accept=".zip">
 
-            <input type="submit" value="Submit game">
+            <!-- <input type="submit" value="Submit game"> -->
         </form>
+        <button onclick="formSubmit()">Click me</button> 
     </body>
 </html>
