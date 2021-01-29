@@ -8,6 +8,8 @@ const html5GameBucketName = "s3782534-cca2-html5-games";
 // Name of dynamodb table with html5 games
 const html5GameInfoTableName = "html5_games";
 
+const tempUploadDb = "game_temp_upload"
+
 const infoFileKey = "info.json"
 
 exports.handler =  function(event, context, callback){
@@ -175,7 +177,7 @@ exports.handler =  function(event, context, callback){
                                                         S: bucketName
                                                     }
                                                 },
-                                                TableName: "game_temp_upload",
+                                                TableName: tempUploadDb,
                                                 ExpressionAttributeNames: {
                                                     "#S": "status"
                                                 },

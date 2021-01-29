@@ -2,6 +2,8 @@
 var AWS = require('aws-sdk');
 var uuid = require('uuid');
 
+const tempUploadDb = "game_temp_upload"
+
 const lambdaUnzipArn = "arn:aws:lambda:us-east-1:077477804827:function:gameUnzipAndAddToDbFunction";
 
 // const https = require('https')
@@ -119,14 +121,14 @@ exports.handler =  function(event, context, callback) {
                     console.error('Presigning post data encountered an error', err);
                 } else {
                     // Get expiry time (time when bucket will be deleted, hour from now)
-                    var expiryTime = Date.now() + (60*60*1000);
+                    var expiryTime = Date.now() + (30*60*1000);
                     // Create dynamodb item for submission
                     var itemParams = {
-                        TableName: "game_temp_upload",
+                        TableName: tempUploadDb,
                         Item: {
                             bucket_name: {S: bucketName},
                             expiry_time: {N: expiryTime.toString()},
-                            signed_url: {S: postData.url},
+                            // signed_url: {S: postData.url},
                             status: {S: "waiting"},
                         }
                     }
