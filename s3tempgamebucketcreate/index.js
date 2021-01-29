@@ -2,7 +2,7 @@
 var AWS = require('aws-sdk');
 var uuid = require('uuid');
 
-
+const lambdaUnzipArn = "arn:aws:lambda:us-east-1:077477804827:function:gameUnzipAndAddToDbFunction";
 
 // const https = require('https')
 // let url = "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
@@ -69,6 +69,45 @@ exports.handler =  function(event, context, callback) {
 
             // signedUrlPromsie.then(function(signedUrl){
 
+            var autoLambdaParams = {
+                Bucket: bucketName,
+                NotificationConfiguration: {
+                    "LambdaFunctionConfigurations": [
+                        {
+                            "Id": "triggerUnzip",
+                            "LambdaFunctionArn": "arn:aws:lambda:us-east-1:077477804827:function:gameUnzipAndAddToDbFunction",
+                            "Events": [
+                                "s3:ObjectCreated:*"
+                            ],
+                            "Filter": {
+                                "Key": {
+                                    "FilterRules": [
+                                        {
+                                            "Name": "Prefix",
+                                            "Value": ""
+                                        },
+                                        {
+                                            "Name": "Suffix",
+                                            "Value": ".zip"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            };
+
+            s3.putBucketNotificationConfiguration(autoLambdaParams, function(err, data){
+            if (err){
+                console.log(err, err.stack);
+                console.error(err);
+                console.log(autoLambdaParams);
+                console.log(bucketName);
+            } else {
+                
+            
+
             var postParams = {
                 Bucket: bucketName,
                 Fields:{
@@ -107,7 +146,8 @@ exports.handler =  function(event, context, callback) {
                 console.log(err, err.stack);
                 callback(Error(err));
             })
-            
+            }
+        })
         
         })
     }).catch(

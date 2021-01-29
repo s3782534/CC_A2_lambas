@@ -164,9 +164,31 @@ exports.handler =  function(event, context, callback){
                                             return;
                                         } else {
                                             console.log(data)
-                                            return "All success";
-                                            //TODO change status of upload to "completed"
-                                            //TODO something idk
+                                            // TODO change status of upload to "completed"
+                                            var updateTempParams = {
+                                                Key: {
+                                                    S: bucketName
+                                                },
+                                                TableName: "game_temp_upload",
+                                                ExpressionAttributeNames: {
+                                                    "#S": "status"
+                                                },
+                                                ExpressionAttributeValues: {
+                                                    ":s": {
+                                                        S: "completed"
+                                                    }
+                                                },
+                                                UpdateExpression: "SET #S = :s"
+                                            }
+                                            dynamoDb.updateItemItem(updateTempParams, function(err, data){
+                                                if (err){
+                                                    console.log(err, err.stack);
+                                                } else {
+                                                    // TODO something idk
+                                                    return "All success";
+
+                                               }
+                                            })
                                         }
                                     })
                                 }
