@@ -9,12 +9,12 @@ var uuid = require('uuid');
 
 exports.handler =  function(event, context, callback) {
 
-    var requestBody = JSON.parse(event.body);
+    var requestParams = event["queryStringParameters"];
 
     // TODO add name check (as it is used as primary key)
     var gameName;
-    if (requestBody["name"]){
-        gameName = requestBody["name"];
+    if (requestParams["name"]){
+        gameName = requestParams["name"];
     } else {
         // TODO add error handling
         gameName = "Sample Name";
@@ -87,7 +87,15 @@ exports.handler =  function(event, context, callback) {
                         callback(Error(err));
                     } else {
                         // Return url and bucketname
-                        callback(null, {signedUrl: signedUrl, bucketName:bucketName}) 
+                        callback(null, {
+                            body: JSON.stringify({
+                                signedUrl: signedUrl, 
+                                bucketName:bucketName
+                            }),
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Access-Control-Allow-Origin": "*",
+                            },}) 
                     }
                 })   
             }, function(err){

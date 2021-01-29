@@ -7,7 +7,8 @@ function formSubmit(){
   console.log("hey");
   // var validS3Allocation = false;
   // var tempS3URL = null;
-  var firstSubmit = {"name":String(document.forms["gameUpload"]["gameName"]["value"])};
+  var gameName = document.forms["gameUpload"]["gameName"]["value"];
+  var firstSubmit = {"name":String(gameName)};
   console.log(firstSubmit);
   var xhttp1 = new XMLHttpRequest();
   xhttp1.onreadystatechange = function() {
@@ -20,9 +21,10 @@ function formSubmit(){
       // validS3Allocation = false;
     }
   };
-  xhttp1.open("POST", getUploadLinkURL, false);
-  xhttp1.setRequestHeader("Content-Type", "application/json");
-  xhttp1.send(JSON.stringify(firstSubmit));
+  xhttp1.open("GET", getUploadLinkURL + "?name=" + gameName, false);
+  // xhttp1.setRequestHeader("Content-Type", "application/json");
+  // xhttp1.send(JSON.stringify(firstSubmit));
+  xhttp1.send();
   // xhttp1.send("yoyo");
   // fetch(getUploadLinkURL, {
   //   method: "POST",
