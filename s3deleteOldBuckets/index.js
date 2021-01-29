@@ -12,7 +12,7 @@ exports.handler =  function(event, context) {
 
     var allTempEntries = dynamoDb.scan(scanParams, function(err, data){
         if (err){
-            console.log (err, err.stack);
+            console.log (err);
         } else {
             var items = data["Items"];
             // console.log(items);
@@ -34,8 +34,10 @@ exports.handler =  function(event, context) {
 
 
                 if (toDelete){
+                    var bucketDeleted = deleteBucket(bucketName);
+                    console.log("Test log (not appearing for some reason)");
                     // delete bucket
-                    if (deleteBucket(bucketName)){
+                    if (bucketDeleted){
                         // delete db entry
                         deleteDbEntry(bucketName, dynamoDb);
                     }
@@ -57,7 +59,7 @@ function deleteDbEntry(bucketName, dynamoDb){
     }
     dynamoDb.deleteItem(deleteParams, function(err,data){
         if (err){
-            console.log (err, err.stack);
+            console.log (err);
             console.log("Unsuccessful deletion of db entry for " + bucketName);
             return;
         } else {
@@ -75,9 +77,10 @@ function deleteBucket(bucketName){
     }
     s3.listObjectsV2(listParams, function(err, data){
         if (err) {
-            console.log (err, err.stack);
-            console.log("Unsuccessful action of listing objects in temp bucket " + bucketName);
-            return;
+            console.log (err);
+            console.log("Unsuccessful action of listing objects in temp bucket " + bucketName + ", assumedly because bucket does not exist.");
+            // Returns true as it is assumed that the bucket does not exist, so remove the db item
+            return true;
         } else {
             console.log("Successful action of listing objects in temp bucket " + bucketName);
             // Variable to hold object keys for use in deleteObjects request
@@ -99,7 +102,7 @@ function deleteBucket(bucketName){
             // Delete all objects in the bucket
             s3.deleteObjects(deleteParams, function(err, data){
                 if (err){
-                    console.log (err, err.stack);
+                    console.log (err);
                     console.log("Unsuccessful deletion of bucket objects for " + bucketName);
                     return;
 
@@ -111,7 +114,7 @@ function deleteBucket(bucketName){
                     }
                     s3.deleteBucket(deleteBucketParams, function (err,data){
                         if (err) {
-                            console.log (err, err.stack);
+                            console.log (err);
                             console.log("Unsuccessful deletion of bucket " + bucketName);
                             return;
                         } else {
