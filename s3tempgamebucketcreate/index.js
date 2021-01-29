@@ -60,49 +60,60 @@ exports.handler =  function(event, context, callback) {
 
             // callback(null, {credentials:tempCredentials["cognito"]["config"]["credentials"], bucketName:bucketName});
             // Create url for zip file upload that lasts for 5 mins
-            var urlParams = {
-                Bucket: bucketName,
-                Key: gameName + ".zip",
-                Expires: 300,
-            }
-            var signedUrlPromsie = s3.getSignedUrlPromise('putObject', urlParams);
+            // var urlParams = {
+            //     Bucket: bucketName,
+            //     Key: gameName,
+            //     // Expires: 300,
+            // }
+            // var signedUrlPromsie = s3.getSignedUrlPromise('putObject', urlParams);
 
-            signedUrlPromsie.then(function(signedUrl){
-                // Get expiry time (time when bucket will be deleted, hour from now)
-                var expiryTime = Date.now() + (60*60*1000);
-                // Create dynamodb item for submission
-                var itemParams = {
-                    TableName: "game_temp_upload",
-                    Item: {
-                        bucket_name: {S: bucketName},
-                        expiry_time: {N: expiryTime.toString()},
-                        signed_url: {S: signedUrl},
-                        status: {S: "waiting"},
-                    }
+            // signedUrlPromsie.then(function(signedUrl){
+
+            var postParams = {
+                Bucket: bucketName,
+                Fields:{
+                    key: "test.zip"
                 }
-                var dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-                dynamoDb.putItem(itemParams, function(err, data){
-                    if (err){
-                        console.log(err, err.stack);
-                        callback(Error(err));
-                    } else {
-                        // Return url and bucketname
-                        callback(null, {
-                            body: JSON.stringify({
-                                signedUrl: signedUrl, 
-                                bucketName:bucketName
-                            }),
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Access-Control-Allow-Origin": "*",
-                            },}) 
+            };
+            s3.createPresignedPost(postParams, function(err, postData){
+                if (err){
+                    console.error('Presigning post data encountered an error', err);
+                } else {
+                    // Get expiry time (time when bucket will be deleted, hour from now)
+                    var expiryTime = Date.now() + (60*60*1000);
+                    // Create dynamodb item for submission
+                    var itemParams = {
+                        TableName: "game_temp_upload",
+                        Item: {
+                            bucket_name: {S: bucketName},
+                            expiry_time: {N: expiryTime.toString()},
+                            signed_url: {S: postData.url},
+                            status: {S: "waiting"},
+                        }
                     }
-                })   
+                    var dynamoDb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+                    dynamoDb.putItem(itemParams, function(err, data){
+                        if (err){
+                            console.log(err, err.stack);
+                            callback(Error(err));
+                        } else {
+                            // Return url and bucketname
+                            callback(null, {
+                                // signedUrl: signedUrl,
+                                data: postData, 
+                                bucketName:bucketName
+                            }) 
+                        }
+                    })   
+
+            }
             }, function(err){
                 console.log(err, err.stack);
                 callback(Error(err));
             })
-        });
+            
+        
+        })
     }).catch(
     function(err) {
         console.error(err, err.stack);

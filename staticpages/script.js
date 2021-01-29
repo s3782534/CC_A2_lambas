@@ -17,6 +17,7 @@ function formSubmit(){
         // tempS3URL = response["s3URL"];
         // validS3Allocation = true;
         console.log(this.responseText);
+        uploadFile(JSON.parse(this.responseText))
     } else {
       // validS3Allocation = false;
     }
