@@ -24,6 +24,7 @@ exports.handler =  function(event, context, callback){
     var s3 = new AWS.S3({apiVersion: '2006-03-01'});
     s3.getObject(infoParams, function(err, data) {
         if (err){
+            console.log("Error reading file in bucket")
             console.log(err, err.stack);
             return;
         } else {
@@ -40,6 +41,7 @@ exports.handler =  function(event, context, callback){
             // copy zip into html5 games
             s3.copyObject(copyParams, function(err, data) {
                 if (err){
+                    console.log("Error copying zip to game folder")
                     console.log(err, err.stack);
                     return;
                 } else {
@@ -55,6 +57,7 @@ exports.handler =  function(event, context, callback){
                         verbose: false
                     }, function(err, success){
                         if (err) {
+                            console.log("Error unzipping zip file")
                             console.log(err, err.stack);
                             return;
                         } else {
@@ -69,6 +72,7 @@ exports.handler =  function(event, context, callback){
                             }
                             s3.listObjectsV2(gameFileListParams, function(err, data){
                                 if (err){
+                                    console.log("Error listing objects in game folder")
                                     console.log(err, err.stack);
                                     return;
                                 } else {
@@ -167,7 +171,9 @@ exports.handler =  function(event, context, callback){
                                             // TODO change status of upload to "completed"
                                             var updateTempParams = {
                                                 Key: {
-                                                    S: bucketName
+                                                    "bucket_name": {
+                                                        S: bucketName
+                                                    }
                                                 },
                                                 TableName: "game_temp_upload",
                                                 ExpressionAttributeNames: {
@@ -180,7 +186,7 @@ exports.handler =  function(event, context, callback){
                                                 },
                                                 UpdateExpression: "SET #S = :s"
                                             }
-                                            dynamoDb.updateItemItem(updateTempParams, function(err, data){
+                                            dynamoDb.updateItem(updateTempParams, function(err, data){
                                                 if (err){
                                                     console.log(err, err.stack);
                                                 } else {
