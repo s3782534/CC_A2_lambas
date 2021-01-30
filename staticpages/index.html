@@ -1,16 +1,34 @@
 <html>
     <script src="script.js"></script> 
+    <head>
+        <link rel="stylesheet" href="style.css">
+    </head>
     <body>
+        
+        <header>
+            <h3><a href="index.php">Whack</a></h3>
+            <h5>Admin upload page</h5>
+        </header>
+
         <form name="gameUpload">
-            <label for="gameName">Game name: </label>
-            <input type="text" id="gameName" name="gameName">
+            <div>
+                <label for="gameName">Game name: </label>
+                <input type="text" id="gameName" name="gameName">
+            </div>
 
-            <label for="gameZip">Game name: </label>
-            <input type="file" id="gameZip" name="gameZip" accept=".zip">
-
-            <!-- <input type="submit" value="Submit game"> -->
+            <div>
+                <label for="gameZip">Game file: </label>
+                <input type="file" id="gameZip" name="gameZip" accept=".zip">
+            </div>
+            
         </form>
+
         <button id=SubmitData onclick="formSubmit()">Submit game</button>
+
         <h6 id=submitStatus></h6> 
+
+        <footer>
+            <h4>whack</h4>
+        </footer>
     </body>
 </html>

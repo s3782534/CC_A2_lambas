@@ -168,7 +168,36 @@ exports.handler =  function(event, context, callback){
                                                     console.log(err, err.stack);
                                                 } else {
                                                     // TODO something idk
-                                                    return "All success";
+                                                    // Run the cleanup lambda
+                                                    // const deleteTempBucketsArn = "arn:aws:lambda:us-east-1:077477804827:function:deleteUnneededTempBuckets";
+                                                    // var lambdaParams = {
+                                                    //     functionName: deleteTempBucketsArn,
+                                                    //     InvocationType: "Event"
+                                                    // }
+                                                    // var lambda = new AWS.Lambda({apiVersion: '2015-03-31'});
+                                                    // lambda.invoke(lambdaParams, function(err, data){
+                                                    //     if (err){
+                                                    //         console.log(err);
+                                                    //     } else {
+                                                    //         return "All success";
+                                                    //     }
+                                                    // })
+                                                    const deleteBucketsTopicArn = "arn:aws:sns:us-east-1:077477804827:delete_temp_buckets";
+                                                    var message = "Game " + gameName + " has been added to our selection of browser games.";
+                                                    var snsParams = {
+                                                        Message: message,
+                                                        TopicArn: deleteBucketsTopicArn
+                                                    }
+                                                    var sns =  new AWS.SNS({apiVersion: '2010-03-31'});
+                                                    sns.publish(snsParams, function(err, data){
+                                                        if (err){
+                                                            console.log(err);
+
+                                                        } else {
+                                                            return "All success";
+
+                                                        }
+                                                    })
 
                                                }
                                             })
