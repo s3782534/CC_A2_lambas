@@ -6,9 +6,6 @@ const tempUploadDb = "game_temp_upload"
 
 const lambdaUnzipArn = "arn:aws:lambda:us-east-1:077477804827:function:gameUnzipAndAddToDbFunction";
 
-// const https = require('https')
-// let url = "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
-
 exports.handler =  function(event, context, callback) {
 
     var requestParams = event["queryStringParameters"];
@@ -46,31 +43,6 @@ exports.handler =  function(event, context, callback) {
         var uploadPromise = s3.putObject(objectParams).promise();
         uploadPromise.then(
         function(data) {
-            // Code for cognito credentials, unused for now
-            // var identityParams = {IdentityId: 'us-east-1:a10f2f66-d2e1-4330-ba0e-846c95ac63ae'}
-            // // console.log("Successfully uploaded data to " + bucketName + "/" + keyName);
-            // // var cognitoIdentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
-            // // var tempCredentials = cognitoIdentity.getCredentialsForIdentity(identityParams);
-            // // tempCredentials.promise().then(function(data){
-            // // })
-
-            // var tempCredentials = new AWS.CognitoIdentityCredentials({
-            //     IdentityPoolId: 'us-east-1:a10f2f66-d2e1-4330-ba0e-846c95ac63ae',
-            // });
-
-            // tempCredentials.refresh()
-
-            // callback(null, {credentials:tempCredentials["cognito"]["config"]["credentials"], bucketName:bucketName});
-            // Create url for zip file upload that lasts for 5 mins
-            // var urlParams = {
-            //     Bucket: bucketName,
-            //     Key: gameName,
-            //     // Expires: 300,
-            // }
-            // var signedUrlPromsie = s3.getSignedUrlPromise('putObject', urlParams);
-
-            // signedUrlPromsie.then(function(signedUrl){
-
             var autoLambdaParams = {
                 Bucket: bucketName,
                 NotificationConfiguration: {
@@ -128,7 +100,6 @@ exports.handler =  function(event, context, callback) {
                         Item: {
                             bucket_name: {S: bucketName},
                             expiry_time: {N: expiryTime.toString()},
-                            // signed_url: {S: postData.url},
                             status: {S: "waiting"},
                         }
                     }
@@ -157,14 +128,6 @@ exports.handler =  function(event, context, callback) {
         console.error(err, err.stack);
         callback(Error(err));
     });
-
-//   https.get(url, (res) => {
-//     callback(null, res.statusCode)
-//   }).on('error', (e) => {
-//     callback(Error(e))
-//   })
 }
 
-// used to debug locally
-// exports.handler({body:JSON.stringify({name:"gameTest"})}, {}, {});
 

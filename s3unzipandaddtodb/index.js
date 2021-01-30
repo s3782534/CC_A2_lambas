@@ -65,12 +65,9 @@ exports.handler =  function(event, context, callback){
                             return;
                         } else {
                             console.log(success);
-                            // delete all contents in old bucket
-                            //TODO
-                            // Add info to database
+                            // List all files loop through them
                             var gameFileListParams = {
                                 Bucket: html5GameBucketName,
-                                // Prefix: "index",
                                 StartAfter: gameName + "/",
                             }
                             s3.listObjectsV2(gameFileListParams, function(err, data){
@@ -83,25 +80,15 @@ exports.handler =  function(event, context, callback){
                                     var gameIndexKey = "";
                                     var gameImageKey = "";
                                     // search through contents until index and image are found
-                                    // var listContents = data["Contents"]
                                     data["Contents"].forEach(function(object) {
-                                    // for (var object of listContents){
-                                        // console.log(object);
                                         var objectKey = object["Key"];
                                         if (typeof objectKey === "string"){
-                                            // console.log("Found key")
                                             var splitKey = objectKey.split('/');
                                             var fileName = splitKey[splitKey.length - 1];
                                             if (fileName === 'index.html'){
                                                 gameIndexKey = objectKey;
-                                                // if (gameImageKey !== ""){
-                                                //     // break;
-                                                // }
                                             } else if (fileName === 'favicon.ico'){
                                                 gameImageKey = objectKey;
-                                            //     if (gameIndexKey !== ""){
-                                            //         // break;
-                                            //     }
                                             }
                                             var aclParams = {
                                                 Bucket: html5GameBucketName,
@@ -123,9 +110,6 @@ exports.handler =  function(event, context, callback){
                                                     Bucket: html5GameBucketName,
                                                     CopySource: (html5GameBucketName + "/" + objectKey),
                                                     Key: objectKey,
-                                                    // Metadata: {
-                                                    //     '<Content-Type>': contentType
-                                                    // },
                                                     ContentType: contentType,
                                                     MetadataDirective: "REPLACE",
                                                     ACL: "public-read"
@@ -138,39 +122,6 @@ exports.handler =  function(event, context, callback){
                                                     }
                                                 })
                                             }
-                                            // Code to change some metadata, still not enough to work
-                                            // TODO look into mime-types module to auto find the content type for files
-                                            // var tempFileNameSplit = fileName.split(".");
-                                            // var metadata = ""
-                                            // var fileNameExtension = tempFileNameSplit[tempFileNameSplit.length - 1];
-                                            // if (fileNameExtension === "html"){
-                                            //     metadata = "text/html";
-                                            // } else if (fileNameExtension === "js"){
-                                            //     metadata = "application/javascript";
-                                            // } else if (fileNameExtension === "css"){
-                                            //     metadata = "text/css";
-                                            // }
-
-                                            // if (metadata !== ""){
-                                            //     var copyParams = {
-                                            //         Bucket: html5GameBucketName,
-                                            //         CopySource: (html5GameBucketName + "/" + objectKey),
-                                            //         Key: objectKey,
-                                            //         // Metadata: {
-                                            //         //     '<Content-Type>': metadata
-                                            //         // },
-                                            //         ContentType: metadata,
-                                            //         MetadataDirective: "REPLACE",
-                                            //         ACL: "public-read"
-                                            //     }
-                                            //     s3.copyObject(copyParams, function(err, data){
-                                            //         if (err){
-                                            //             console.log(err, err.stack);
-                                            //         } else {
-
-                                            //         }
-                                            //     })
-                                            // }
                                         }
                                     })
                                     var itemParams = {
